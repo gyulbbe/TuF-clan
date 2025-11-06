@@ -4,7 +4,7 @@
 
     <!-- 말투 학습 등록 -->
     <insert id="insertSpeechLearning" parameterType="insertSpeechLearningDto">
-        INSERT INTO speech_learning (
+        INSERT INTO speech_style_learning (
             user_id,
             text
         ) VALUES (
@@ -12,5 +12,16 @@
             #{text}
         )
     </insert>
+
+    <!-- 모든 말투 학습 조회 -->
+    <select id="findAllSpeechLearning" resultType="SpeechLearningDto">
+        SELECT
+            id as speechLearningId,
+            user_id as userId,
+            text,
+            created_at as createdAt
+        FROM speech_style_learning
+        ORDER BY id
+    </select>
 
 </mapper>
