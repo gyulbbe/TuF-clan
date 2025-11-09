@@ -25,4 +25,26 @@
         )
     </insert>
 
+    <!-- 사용자 리스트 배치 등록 -->
+    <insert id="insertUserList" parameterType="list">
+        INSERT INTO users (
+            user_id,
+            password,
+            tier,
+            race,
+            status,
+            user_type
+        ) VALUES
+        <foreach collection="list" item="user" separator=",">
+            (
+                #{user.userId},
+                '1234',
+                #{user.tier},
+                #{user.race},
+                'ACTIVE',
+                'USER'
+            )
+        </foreach>
+    </insert>
+
 </mapper>

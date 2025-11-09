@@ -16,7 +16,10 @@
       "Bash(./gradlew.bat bootRun)",
       "Bash(./gradlew.bat build:*)",
       "Bash(temp_embedding.json)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(find:*)",
+      "Bash(nul)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
