@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.gyulbbe.common.utils.embeddingVector.EmbeddingVectorMapper">
+
+    <!-- ResultMap 정의 -->
+    <resultMap id="embeddingVectorResultMap" type="EmbeddingVectorDto">
+        <result column="reference_id" property="referenceId" />
+        <result column="reference_type" property="referenceType" />
+        <result column="text" property="text" />
+        <result column="vector" property="embeddingVector"
+                typeHandler="io.github.gyulbbe.common.utils.embeddingVector.FloatArrayTypeHandler" />
+        <result column="distance" property="distance" />
+    </resultMap>
+
+    <!-- 임베딩 벡터 등록 (KoSimCSE-RoBERTa 모델로 생성된 벡터) -->
+    <insert id="insertEmbeddingVector" parameterType="EmbeddingVectorDto">
+        INSERT INTO vectors (
+            reference_id,
+            reference_type,
+            vector
+        ) VALUES (
+            #{referenceId},
+            #{referenceType},
+            #{embeddingVector, typeHandler=io.github.gyulbbe.common.utils.embeddingVector.FloatArrayTypeHandler}
+        )
+    </insert>
+
+    <!-- 모든 벡터 조회 (Java에서 유사도 계산용) -->
+    <select id="findAllVectors" resultMap="embeddingVectorResultMap">
+        SELECT
+            reference_id,
+            reference_type,
+            vector
+        FROM vectors
+        <where>
+            <if test="referenceType != null and referenceType != ''">
+                AND reference_type = #{referenceType}
+            </if>
+        </where>
+    </select>
+
+    <!-- 유사도 검색 (Deprecated - Java에서 처리) -->
+    <select id="findSimilarVectors" parameterType="SimilaritySearchRequestDto" resultMap="embeddingVectorResultMap">
+        SELECT
+            reference_id,
+            reference_type,
+            vector
+        FROM vectors
+        <where>
+            <if test="referenceType != null and referenceType != ''">
+                AND reference_type = #{referenceType}
+            </if>
+        </where>
+    </select>
+
+    <!-- 가장 유사한 벡터 하나 조회 (Deprecated - Java에서 처리) -->
+    <select id="findMostSimilarVector" parameterType="SimilaritySearchRequestDto" resultMap="embeddingVectorResultMap">
+        SELECT
+            reference_id,
+            reference_type,
+            vector
+        FROM vectors
+        <where>
+            <if test="referenceType != null and referenceType != ''">
+                AND reference_type = #{referenceType}
+            </if>
+        </where>
+    </select>
+
+</mapper>

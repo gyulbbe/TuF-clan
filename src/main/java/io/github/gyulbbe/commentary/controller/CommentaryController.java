@@ -1,0 +1,33 @@
+package io.github.gyulbbe.commentary.controller;
+
+import io.github.gyulbbe.commentary.dto.insertCommentaryDto;
+import io.github.gyulbbe.commentary.service.CommentaryService;
+import io.github.gyulbbe.common.dto.ResponseDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RequestMapping("/commentary")
+@RequiredArgsConstructor
+@RestController
+public class CommentaryController {
+
+    private final CommentaryService commentaryService;
+
+    @PostMapping("/insert")
+    public ResponseEntity<ResponseDto<Void>> insertCommentary(@Valid @RequestBody insertCommentaryDto insertCommentaryDto) {
+        return ResponseEntity.ok(commentaryService.insertCommentary(insertCommentaryDto));
+    }
+
+    @PostMapping("/embed-all")
+    public ResponseEntity<ResponseDto<String>> embedAllCommentaries() {
+        return ResponseEntity.ok(commentaryService.embedAllCommentaries());
+    }
+
+    @GetMapping("/test")
+    public void test() {
+        System.out.println("테스트");
+    }
+}

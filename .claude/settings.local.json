@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /s /b \"C:\\dev\\tuf\")",
+      "Bash(findstr:*)",
+      "Bash(gradlew.bat build:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(dir /s /b \"C:\\dev\\tuf\\src\\main\\java\")",
+      "Bash(gradlew.bat clean build:*)",
+      "Bash(timeout /t 15)",
+      "Bash(curl:*)",
+      "Bash(sqlplus:*)",
+      "Bash(taskkill:*)",
+      "Bash(taskkill.exe:*)",
+      "Bash(./gradlew.bat bootRun)",
+      "Bash(./gradlew.bat build:*)",
+      "Bash(temp_embedding.json)",
+      "Bash(python:*)",
+      "Bash(find:*)",
+      "Bash(nul)",
+      "Bash(dir:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
