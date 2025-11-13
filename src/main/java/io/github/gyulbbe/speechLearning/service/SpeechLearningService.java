@@ -1,8 +1,8 @@
 package io.github.gyulbbe.speechLearning.service;
 
 import io.github.gyulbbe.common.dto.ResponseDto;
+import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingService;
 import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingVectorDto;
-import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingVectorService;
 import io.github.gyulbbe.speechLearning.dto.SpeechLearningDto;
 import io.github.gyulbbe.speechLearning.dto.insertSpeechLearningDto;
 import io.github.gyulbbe.speechLearning.mapper.SpeechLearningMapper;
@@ -20,7 +20,7 @@ import java.util.List;
 public class SpeechLearningService {
 
     private final SpeechLearningMapper speechLearningMapper;
-    private final EmbeddingVectorService embeddingVectorService;
+    private final EmbeddingService embeddingService;
 
     public ResponseDto<Void> insertSpeechLearning(insertSpeechLearningDto insertSpeechLearningDto) {
         int result = speechLearningMapper.insertSpeechLearning(insertSpeechLearningDto);
@@ -57,19 +57,18 @@ public class SpeechLearningService {
             // 각 SpeechLearning을 임베딩하여 저장
             for (SpeechLearningDto speechLearning : speechLearnings) {
                 try {
-                    EmbeddingVectorDto embeddingDto = new EmbeddingVectorDto();
-                    embeddingDto.setReferenceId(speechLearning.getSpeechLearningId());
-                    embeddingDto.setReferenceType("SPEECH_STYLE_LEARNING");
-                    embeddingDto.setText(speechLearning.getText());
+                    int result = embeddingService.embedAndSave(
+                            speechLearning.getSpeechLearningId(),
+                            "SPEECH_STYLE_LEARNING",
+                            speechLearning.getText()
+                    );
 
-                    ResponseDto<Void> result = embeddingVectorService.insertEmbeddingVector(embeddingDto);
-
-                    if ("success".equals(result.getMessage())) {
+                    if (result > 0) {
                         successCount++;
                         log.info("SpeechLearning ID {} 임베딩 성공", speechLearning.getSpeechLearningId());
                     } else {
                         failCount++;
-                        log.error("SpeechLearning ID {} 임베딩 실패: {}", speechLearning.getSpeechLearningId(), result.getMessage());
+                        log.error("SpeechLearning ID {} 임베딩 실패", speechLearning.getSpeechLearningId());
                     }
                 } catch (Exception e) {
                     failCount++;

@@ -4,8 +4,7 @@ import io.github.gyulbbe.commentary.dto.CommentaryDto;
 import io.github.gyulbbe.commentary.dto.insertCommentaryDto;
 import io.github.gyulbbe.commentary.mapper.CommentaryMapper;
 import io.github.gyulbbe.common.dto.ResponseDto;
-import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingVectorDto;
-import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingVectorService;
+import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import java.util.List;
 public class CommentaryService {
 
     private final CommentaryMapper commentaryMapper;
-    private final EmbeddingVectorService embeddingVectorService;
+    private final EmbeddingService embeddingService;
 
     public ResponseDto<Void> insertCommentary(insertCommentaryDto insertCommentaryDto) {
         int result = commentaryMapper.insertCommentary(insertCommentaryDto);
@@ -32,7 +31,7 @@ public class CommentaryService {
     }
 
     /**
-     * COMMENTARY 테이블의 모든 데이터를 임베딩하여 VECTORS 테이블에 저장
+     * COMMENTARIES 테이블의 모든 데이터를 임베딩하여 VECTORS 테이블에 저장
      */
     public ResponseDto<String> embedAllCommentaries() {
         try {
@@ -40,7 +39,7 @@ public class CommentaryService {
             List<CommentaryDto> commentaries = commentaryMapper.findAllCommentaries();
 
             if (commentaries == null || commentaries.isEmpty()) {
-                return ResponseDto.fail("저장된 해설이 없습니다.");
+                return ResponseDto.fail("저장된 해설 데이터가 없습니다.");
             }
 
             int successCount = 0;
@@ -49,19 +48,18 @@ public class CommentaryService {
             // 각 Commentary를 임베딩하여 저장
             for (CommentaryDto commentary : commentaries) {
                 try {
-                    EmbeddingVectorDto embeddingDto = new EmbeddingVectorDto();
-                    embeddingDto.setReferenceId(commentary.getCommentaryId());
-                    embeddingDto.setReferenceType("COMMENTARY");
-                    embeddingDto.setText(commentary.getMatchSummary());
+                    int result = embeddingService.embedAndSave(
+                            commentary.getCommentaryId(),
+                            "COMMENTARIES",
+                            commentary.getMatchSummary()
+                    );
 
-                    ResponseDto<Void> result = embeddingVectorService.insertEmbeddingVector(embeddingDto);
-
-                    if ("success".equals(result.getMessage())) {
+                    if (result > 0) {
                         successCount++;
                         log.info("Commentary ID {} 임베딩 성공", commentary.getCommentaryId());
                     } else {
                         failCount++;
-                        log.error("Commentary ID {} 임베딩 실패: {}", commentary.getCommentaryId(), result.getMessage());
+                        log.error("Commentary ID {} 임베딩 실패", commentary.getCommentaryId());
                     }
                 } catch (Exception e) {
                     failCount++;
