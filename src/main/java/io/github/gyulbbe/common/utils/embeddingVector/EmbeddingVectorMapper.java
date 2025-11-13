@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface EmbeddingVectorMapper {
     int insertEmbeddingVector(EmbeddingVectorDto embeddingVectorDto);
-    List<EmbeddingVectorDto> findAllVectors(@Param("referenceType") String referenceType);
+    List<EmbeddingVectorDto> findAllVectors(@Param("referenceTable") String referenceTable);
     List<EmbeddingVectorDto> findSimilarVectors(SimilaritySearchRequestDto requestDto);
     EmbeddingVectorDto findMostSimilarVector(SimilaritySearchRequestDto requestDto);
 }
