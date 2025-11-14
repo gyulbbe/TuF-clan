@@ -1,8 +1,8 @@
 package io.github.gyulbbe.commentary.service;
 
 import io.github.gyulbbe.commentary.dto.CommentaryDto;
-import io.github.gyulbbe.commentary.dto.insertCommentaryDto;
-import io.github.gyulbbe.commentary.mapper.CommentaryMapper;
+import io.github.gyulbbe.commentary.entity.CommentaryEntity;
+import io.github.gyulbbe.commentary.repository.CommentaryRepository;
 import io.github.gyulbbe.common.dto.ResponseDto;
 import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -18,15 +19,80 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentaryService {
 
-    private final CommentaryMapper commentaryMapper;
+    private final CommentaryRepository commentaryRepository;
     private final EmbeddingService embeddingService;
 
-    public ResponseDto<Void> insertCommentary(insertCommentaryDto insertCommentaryDto) {
-        int result = commentaryMapper.insertCommentary(insertCommentaryDto);
-        if (result > 0) {
+    public ResponseDto<Void> insertCommentary(CommentaryDto commentaryDto) {
+        try {
+            CommentaryEntity entity = new CommentaryEntity();
+            entity.setMatchInfoId(commentaryDto.getMatchInfoId());
+            entity.setMatchSummary(commentaryDto.getMatchSummary());
+
+            commentaryRepository.save(entity);
             return ResponseDto.success(null);
-        } else {
+        } catch (Exception e) {
+            log.error("해설 등록 실패", e);
             return ResponseDto.fail("해설 등록에 실패했습니다.");
+        }
+    }
+
+    public ResponseDto<CommentaryDto> findCommentaryById(Long id) {
+        try {
+            CommentaryEntity entity = commentaryRepository.findById(id)
+                    .orElse(null);
+
+            if (entity == null) {
+                return ResponseDto.fail("해설을 찾을 수 없습니다.");
+            }
+
+            CommentaryDto dto = new CommentaryDto();
+            dto.setId(entity.getId());
+            dto.setMatchInfoId(entity.getMatchInfoId());
+            dto.setMatchSummary(entity.getMatchSummary());
+
+            return ResponseDto.success(dto);
+        } catch (Exception e) {
+            log.error("해설 조회 실패", e);
+            return ResponseDto.fail("해설 조회에 실패했습니다.");
+        }
+    }
+
+    public ResponseDto<Void> updateCommentary(Long id, CommentaryDto commentaryDto) {
+        try {
+            CommentaryEntity entity = commentaryRepository.findById(id)
+                    .orElse(null);
+
+            if (entity == null) {
+                return ResponseDto.fail("해설을 찾을 수 없습니다.");
+            }
+
+            entity.setMatchInfoId(commentaryDto.getMatchInfoId());
+            entity.setMatchSummary(commentaryDto.getMatchSummary());
+
+            commentaryRepository.save(entity);
+            return ResponseDto.success(null);
+        } catch (Exception e) {
+            log.error("해설 수정 실패", e);
+            return ResponseDto.fail("해설 수정에 실패했습니다.");
+        }
+    }
+
+    public ResponseDto<List<CommentaryDto>> list() {
+        try {
+            List<CommentaryEntity> entities = commentaryRepository.findAll();
+
+            List<CommentaryDto> dtos = entities.stream().map(entity -> {
+                CommentaryDto dto = new CommentaryDto();
+                dto.setId(entity.getId());
+                dto.setMatchInfoId(entity.getMatchInfoId());
+                dto.setMatchSummary(entity.getMatchSummary());
+                return dto;
+            }).toList();
+
+            return ResponseDto.success(dtos);
+        } catch (Exception e) {
+            log.error("해설 목록 조회 실패", e);
+            return ResponseDto.fail("해설 목록 조회에 실패했습니다.");
         }
     }
 
@@ -36,7 +102,7 @@ public class CommentaryService {
     public ResponseDto<String> embedAllCommentaries() {
         try {
             // 모든 Commentary 조회
-            List<CommentaryDto> commentaries = commentaryMapper.findAllCommentaries();
+            List<CommentaryEntity> commentaries = commentaryRepository.findAll();
 
             if (commentaries == null || commentaries.isEmpty()) {
                 return ResponseDto.fail("저장된 해설 데이터가 없습니다.");
@@ -46,24 +112,24 @@ public class CommentaryService {
             int failCount = 0;
 
             // 각 Commentary를 임베딩하여 저장
-            for (CommentaryDto commentary : commentaries) {
+            for (CommentaryEntity commentary : commentaries) {
                 try {
                     int result = embeddingService.embedAndSave(
-                            commentary.getCommentaryId(),
+                            commentary.getId(),
                             "COMMENTARIES",
                             commentary.getMatchSummary()
                     );
 
                     if (result > 0) {
                         successCount++;
-                        log.info("Commentary ID {} 임베딩 성공", commentary.getCommentaryId());
+                        log.info("Commentary ID {} 임베딩 성공", commentary.getId());
                     } else {
                         failCount++;
-                        log.error("Commentary ID {} 임베딩 실패", commentary.getCommentaryId());
+                        log.error("Commentary ID {} 임베딩 실패", commentary.getId());
                     }
                 } catch (Exception e) {
                     failCount++;
-                    log.error("Commentary ID {} 임베딩 중 오류 발생", commentary.getCommentaryId(), e);
+                    log.error("Commentary ID {} 임베딩 중 오류 발생", commentary.getId(), e);
                 }
             }
 

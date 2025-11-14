@@ -40,33 +40,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors((cors) -> cors.configurationSource(new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-
-                CorsConfiguration corsConfiguration = new CorsConfiguration();
-                corsConfiguration.setAllowedOrigins(Collections.singletonList("https://tufclan.vercel.app"));
-                corsConfiguration.setAllowCredentials(true);
-                corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
-                corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-                corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization"));
-                corsConfiguration.setMaxAge(3600L);
-                return corsConfiguration;
-            }
+        http.cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration corsConfiguration = new CorsConfiguration();
+            corsConfiguration.setAllowedOrigins(Collections.singletonList("https://tufclan.vercel.app"));
+            corsConfiguration.setAllowCredentials(true);
+            corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+            corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+            corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization"));
+            corsConfiguration.setMaxAge(3600L);
+            return corsConfiguration;
         }));
 
-        http.csrf((auth) -> auth.disable());
+        http.csrf(auth -> auth.disable());
 
-        http.formLogin((auth) -> auth.disable());
+        http.formLogin(auth -> auth.disable());
 
-        http.httpBasic((auth) -> auth.disable());
+        http.httpBasic(auth -> auth.disable());
 
 //        http.authorizeHttpRequests((auth) -> auth
 //                .requestMatchers("/login").permitAll()
 //                .requestMatchers("/admin").hasAnyRole("MANAGER", "MASTER", "ADMIN")
 //                .anyRequest().authenticated());
 
-        http.authorizeHttpRequests((auth) -> auth
+        http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin").hasAnyRole("MANAGER", "MASTER", "ADMIN")
                 .anyRequest().permitAll());
 
@@ -74,7 +70,7 @@ public class SecurityConfig {
 
         http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-        http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }

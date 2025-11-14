@@ -6,6 +6,7 @@ import io.github.gyulbbe.user.dto.RegisterUserDto;
 import io.github.gyulbbe.user.dto.UserInsertDto;
 import io.github.gyulbbe.user.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+@Slf4j
 @RequestMapping("/user")
 @AllArgsConstructor
 @RestController
@@ -28,8 +30,8 @@ public class UserController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
-        System.out.println("Username: " + username);
-        System.out.println("Authorities size: " + authorities.size());
+        log.info("Username: " + username);
+        log.info("Authorities size: " + authorities.size());
 
         if (authorities.isEmpty()) {
             return username + " (no authorities)";
@@ -39,7 +41,7 @@ public class UserController {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        System.out.println("Role: " + role);
+        log.info("Role: " + role);
 
         return username + " " + role;
     }

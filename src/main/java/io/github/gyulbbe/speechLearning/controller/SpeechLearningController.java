@@ -2,7 +2,6 @@ package io.github.gyulbbe.speechLearning.controller;
 
 import io.github.gyulbbe.common.dto.ResponseDto;
 import io.github.gyulbbe.speechLearning.dto.SpeechLearningDto;
-import io.github.gyulbbe.speechLearning.dto.insertSpeechLearningDto;
 import io.github.gyulbbe.speechLearning.service.SpeechLearningService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +17,14 @@ public class SpeechLearningController {
 
     private final SpeechLearningService speechLearningService;
 
-    @GetMapping("/all")
-    public ResponseEntity<ResponseDto<List<SpeechLearningDto>>> findAllSpeechLearning() {
+    @GetMapping("/list")
+    public ResponseEntity<ResponseDto<List<SpeechLearningDto>>> list() {
         return ResponseEntity.ok(speechLearningService.findAllSpeechLearning());
     }
 
     @PostMapping("/insert")
-    public ResponseEntity<ResponseDto<Void>> insertSpeechLearning(@Valid @RequestBody insertSpeechLearningDto insertSpeechLearningDto) {
-        return ResponseEntity.ok(speechLearningService.insertSpeechLearning(insertSpeechLearningDto));
+    public ResponseEntity<ResponseDto<Void>> insertSpeechLearning(@Valid @RequestBody SpeechLearningDto speechLearningDto) {
+        return ResponseEntity.ok(speechLearningService.insertSpeechLearning(speechLearningDto));
     }
 
     @PostMapping("/embed-all")
@@ -33,8 +32,13 @@ public class SpeechLearningController {
         return ResponseEntity.ok(speechLearningService.embedAllSpeechLearning());
     }
 
-    @GetMapping("/test")
-    public void test() {
-        System.out.println("테스트");
+    @GetMapping("/get")
+    public ResponseEntity<ResponseDto<SpeechLearningDto>> findSpeechLearningById(@RequestBody SpeechLearningDto speechLearningDto) {
+        return ResponseEntity.ok(speechLearningService.findSpeechLearningById(speechLearningDto.getId()));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ResponseDto<Void>> updateSpeechLearning(@Valid @RequestBody SpeechLearningDto speechLearningDto) {
+        return ResponseEntity.ok(speechLearningService.updateSpeechLearning(speechLearningDto.getId(), speechLearningDto));
     }
 }
