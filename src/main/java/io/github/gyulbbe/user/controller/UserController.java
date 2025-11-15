@@ -1,9 +1,7 @@
 package io.github.gyulbbe.user.controller;
 
 import io.github.gyulbbe.common.dto.ResponseDto;
-import io.github.gyulbbe.user.dto.CustomUserDetails;
 import io.github.gyulbbe.user.dto.RegisterUserDto;
-import io.github.gyulbbe.user.dto.UserInsertDto;
 import io.github.gyulbbe.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

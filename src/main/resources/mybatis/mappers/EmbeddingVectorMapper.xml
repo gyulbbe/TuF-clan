@@ -25,20 +25,6 @@
         )
     </insert>
 
-    <!-- 모든 벡터 조회 (Java에서 유사도 계산용) -->
-    <select id="findAllVectors" resultMap="embeddingVectorResultMap">
-        SELECT
-            reference_id,
-            reference_table,
-            imbedding_vector
-        FROM vectors
-        <where>
-            <if test="referenceTable != null and referenceTable != ''">
-                AND reference_table = #{referenceTable}
-            </if>
-        </where>
-    </select>
-
     <!-- 유사도 검색 (Oracle 23ai VECTOR_DISTANCE 사용) -->
     <select id="findSimilarVectors" parameterType="SimilaritySearchRequestDto" resultMap="embeddingVectorResultMap">
         SELECT
