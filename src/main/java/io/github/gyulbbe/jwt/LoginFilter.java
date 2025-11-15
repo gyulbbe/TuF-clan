@@ -1,5 +1,6 @@
 package io.github.gyulbbe.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.gyulbbe.user.dto.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,7 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -28,11 +32,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication (HttpServletRequest request, HttpServletResponse response) {
 
-        String username = obtainUsername(request);
-        String password = obtainPassword(request);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> data = objectMapper.readValue(request.getInputStream(), Map.class);
 
-        System.out.println("username: " + username);
-        System.out.println("password: " + password);
+        String username = data.get("username");
+        String password = data.get("password");
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password, null);
 
@@ -49,7 +53,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60*60*1000L);
+        String token = jwtUtil.createJwt(username, role, 60*60*1000L*2);
 
         response.addHeader("Authorization", "Bearer " + token);
     }
