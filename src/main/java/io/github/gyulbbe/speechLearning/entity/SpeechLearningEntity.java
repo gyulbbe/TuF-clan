@@ -3,6 +3,8 @@ package io.github.gyulbbe.speechLearning.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -15,13 +17,17 @@ public class SpeechLearningEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "USER_ID", nullable = false)
-    private Long userId;
+    @Column(name = "NICKNAME", nullable = false)
+    private String nickname;
 
-    @Column(name = "TEXT")
-    private String text;
+    @Column(name = "CHAT")
+    private String chat;
+
+    @Column(name = "CHAT_EMBEDDING_VECTOR", columnDefinition = "VECTOR")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private float[] chatEmbeddingVector;
 
     @CreationTimestamp
-    @Column(name = "CREATED_AT", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "CHAT_DATETIME", updatable = false)
+    private LocalDateTime chatDatetime;
 }
