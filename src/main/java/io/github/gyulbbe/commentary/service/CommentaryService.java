@@ -35,47 +35,6 @@ public class CommentaryService {
         }
     }
 
-    public ResponseDto<CommentaryDto> findCommentaryById(Long id) {
-        try {
-            CommentaryEntity entity = commentaryRepository.findById(id)
-                    .orElse(null);
-
-            if (entity == null) {
-                return ResponseDto.fail("해설을 찾을 수 없습니다.");
-            }
-
-            CommentaryDto dto = new CommentaryDto();
-            dto.setId(entity.getId());
-            dto.setMatchInfoId(entity.getMatchInfoId());
-            dto.setMatchSummary(entity.getMatchSummary());
-
-            return ResponseDto.success(dto);
-        } catch (Exception e) {
-            log.error("해설 조회 실패", e);
-            return ResponseDto.fail("해설 조회에 실패했습니다.");
-        }
-    }
-
-    public ResponseDto<Void> updateCommentary(Long id, CommentaryDto commentaryDto) {
-        try {
-            CommentaryEntity entity = commentaryRepository.findById(id)
-                    .orElse(null);
-
-            if (entity == null) {
-                return ResponseDto.fail("해설을 찾을 수 없습니다.");
-            }
-
-            entity.setMatchInfoId(commentaryDto.getMatchInfoId());
-            entity.setMatchSummary(commentaryDto.getMatchSummary());
-
-            commentaryRepository.save(entity);
-            return ResponseDto.success(null);
-        } catch (Exception e) {
-            log.error("해설 수정 실패", e);
-            return ResponseDto.fail("해설 수정에 실패했습니다.");
-        }
-    }
-
     public ResponseDto<List<CommentaryDto>> list() {
         try {
             List<CommentaryEntity> entities = commentaryRepository.findAll();

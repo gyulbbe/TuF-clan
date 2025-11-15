@@ -23,7 +23,7 @@ public class SpeechController {
      * 채팅 리스트 저장 (임베딩 포함)
      * POST /speech-learning
      */
-    @PostMapping
+    @PostMapping("/insert")
     public ResponseEntity<ResponseDto<String>> insertSpeechLearningList(@Valid @RequestBody List<SpeechDto> dtoList) {
         log.info("채팅 리스트 저장 요청 - 개수: {}", dtoList.size());
         ResponseDto<String> response = speechLearningService.insertSpeechLearningList(dtoList);
