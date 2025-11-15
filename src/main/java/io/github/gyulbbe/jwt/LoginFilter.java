@@ -55,11 +55,37 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String token = jwtUtil.createJwt(username, role, 60*60*1000L*2);
 
+        // JWT 토큰을 헤더에 추가
         response.addHeader("Authorization", "Bearer " + token);
+
+        // 응답 body에 사용자 정보를 JSON으로 반환
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> responseData = Map.of(
+            "userId", username,
+            "role", role
+        );
+
+        response.getWriter().write(objectMapper.writeValueAsString(responseData));
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        response.setStatus(401);
+        // 응답 설정
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // 에러 응답 JSON 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> errorResponse = Map.of(
+            "message", "로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다.",
+            "error", failed.getMessage()
+        );
+
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }
