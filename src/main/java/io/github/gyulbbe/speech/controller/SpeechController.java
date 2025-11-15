@@ -1,8 +1,8 @@
-package io.github.gyulbbe.speechLearning.controller;
+package io.github.gyulbbe.speech.controller;
 
 import io.github.gyulbbe.common.dto.ResponseDto;
-import io.github.gyulbbe.speechLearning.dto.SpeechLearningDto;
-import io.github.gyulbbe.speechLearning.service.SpeechLearningService;
+import io.github.gyulbbe.speech.dto.SpeechDto;
+import io.github.gyulbbe.speech.service.SpeechService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +15,16 @@ import java.util.List;
 @RequestMapping("/speech-learning")
 @RequiredArgsConstructor
 @RestController
-public class SpeechLearningController {
+public class SpeechController {
 
-    private final SpeechLearningService speechLearningService;
+    private final SpeechService speechLearningService;
 
     /**
      * 채팅 리스트 저장 (임베딩 포함)
      * POST /speech-learning
      */
     @PostMapping
-    public ResponseEntity<ResponseDto<String>> insertSpeechLearningList(@Valid @RequestBody List<SpeechLearningDto> dtoList) {
+    public ResponseEntity<ResponseDto<String>> insertSpeechLearningList(@Valid @RequestBody List<SpeechDto> dtoList) {
         log.info("채팅 리스트 저장 요청 - 개수: {}", dtoList.size());
         ResponseDto<String> response = speechLearningService.insertSpeechLearningList(dtoList);
         return ResponseEntity.ok(response);

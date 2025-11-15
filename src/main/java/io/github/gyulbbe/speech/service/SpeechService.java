@@ -1,10 +1,10 @@
-package io.github.gyulbbe.speechLearning.service;
+package io.github.gyulbbe.speech.service;
 
 import io.github.gyulbbe.common.dto.ResponseDto;
 import io.github.gyulbbe.common.utils.embeddingVector.EmbeddingService;
-import io.github.gyulbbe.speechLearning.dto.SpeechLearningDto;
-import io.github.gyulbbe.speechLearning.entity.SpeechLearningEntity;
-import io.github.gyulbbe.speechLearning.repository.SpeechLearningRepository;
+import io.github.gyulbbe.speech.dto.SpeechDto;
+import io.github.gyulbbe.speech.entity.SpeechEntity;
+import io.github.gyulbbe.speech.repository.SpeechRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,15 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SpeechLearningService {
+public class SpeechService {
 
-    private final SpeechLearningRepository speechLearningRepository;
+    private final SpeechRepository speechLearningRepository;
     private final EmbeddingService embeddingService;
 
     /**
@@ -28,7 +27,7 @@ public class SpeechLearningService {
      * @param dtoList 채팅 데이터 리스트
      * @return 저장된 엔티티 개수
      */
-    public ResponseDto<String> insertSpeechLearningList(List<SpeechLearningDto> dtoList) {
+    public ResponseDto<String> insertSpeechLearningList(List<SpeechDto> dtoList) {
         try {
             if (dtoList == null || dtoList.isEmpty()) {
                 return ResponseDto.fail("저장할 채팅 데이터가 없습니다.");
@@ -38,7 +37,7 @@ public class SpeechLearningService {
 
             // 1. 모든 채팅 텍스트 추출
             List<String> chatTexts = dtoList.stream()
-                    .map(SpeechLearningDto::getChat)
+                    .map(SpeechDto::getChat)
                     .filter(chat -> chat != null && !chat.isEmpty())
                     .toList();
 
@@ -47,10 +46,10 @@ public class SpeechLearningService {
             log.info("임베딩 생성 완료 - 개수: {}", embeddings.size());
 
             // 3. 엔티티 생성 및 저장
-            List<SpeechLearningEntity> entities = new ArrayList<>();
+            List<SpeechEntity> entities = new ArrayList<>();
             for (int i = 0; i < dtoList.size(); i++) {
-                SpeechLearningDto dto = dtoList.get(i);
-                SpeechLearningEntity entity = new SpeechLearningEntity();
+                SpeechDto dto = dtoList.get(i);
+                SpeechEntity entity = new SpeechEntity();
                 entity.setNickname(dto.getNickname());
                 entity.setChat(dto.getChat());
 
@@ -62,7 +61,7 @@ public class SpeechLearningService {
                 entities.add(entity);
             }
 
-            List<SpeechLearningEntity> savedEntities = speechLearningRepository.saveAll(entities);
+            List<SpeechEntity> savedEntities = speechLearningRepository.saveAll(entities);
             log.info("채팅 리스트 저장 완료 - 저장된 개수: {}", savedEntities.size());
 
             String message = String.format("채팅 %d개가 성공적으로 저장되었습니다.", savedEntities.size());

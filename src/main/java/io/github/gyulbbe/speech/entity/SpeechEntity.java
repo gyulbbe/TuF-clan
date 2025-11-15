@@ -1,4 +1,4 @@
-package io.github.gyulbbe.speechLearning.entity;
+package io.github.gyulbbe.speech.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(name = "SPEECH_STYLE_LEARNING")
-public class SpeechLearningEntity {
+public class SpeechEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
